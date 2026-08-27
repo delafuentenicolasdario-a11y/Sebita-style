@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebita Style - Club de Puntos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #0A0A0A; color: white; overflow-x: hidden; }
+        .gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #B8962E 100%); }
+        .bg-dark-card { background-color: #171717; border: 1px solid #262626; }
+        .loader { border-top-color: #D4AF37; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
+        <div class="loader w-12 h-12 border-4 border-zinc-800 rounded-full mb-4"></div>
+        <div class="text-yellow-500 font-bold tracking-widest animate-pulse">SEBITA STYLE</div>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="max-w-md mx-auto p-6 min-h-screen">
+        
+        <!-- VISTA: LOGIN -->
+        <div id="view-login" class="hidden py-10">
+            <div class="text-center mb-10">
+                <h1 class="text-5xl font-black text-yellow-500 italic mb-2">SEBITA STYLE</h1>
+                <p class="text-zinc-500 tracking-widest text-sm uppercase">Cortate. Sumá. Ganá.</p>
+            </div>
+            <div class="space-y-4">
+                <input id="login-email" type="email" placeholder="Tu Email" class="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-800 outline-none focus:border-yellow-600 transition-all">
+                <input id="login-password" type="password" placeholder="Tu Contraseña" class="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-800 outline-none focus:border-yellow-600 transition-all">
+                <button onclick="login()" class="w-full gold-gradient p-4 rounded-2xl font-bold text-black uppercase shadow-lg shadow-yellow-600/20 active:scale-95 transition-transform">Iniciar Sesión</button>
+                <button onclick="showView('register')" class="w-full text-zinc-500 text-sm font-medium">¿Sos nuevo? <span class="text-yellow-500">Crear mi cuenta</span></button>
+            </div>
+        </div>
+
+        <!-- VISTA: REGISTRO -->
+        <div id="view-register" class="hidden py-10">
+            <h2 class="text-3xl font-black mb-2">SUMATE AL CLUB</h2>
+            <p class="text-zinc-500 mb-8">Ganás 5 puntos de bienvenida.</p>
+            <div class="space-y-4">
+                <input id="reg-name" type="text" placeholder="Tu Nombre" class="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-800 outline-none">
+                <input id="reg-email" type="email" placeholder="Tu Email" class="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-800 outline-none">
+                <input id="reg-password" type="password" placeholder="Contraseña (mín. 6 caracteres)" class="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-800 outline-none">
+                <button onclick="register()" class="w-full gold-gradient p-4 rounded-2xl font-bold text-black uppercase active:scale-95 transition-transform">Crear Cuenta</button>
+                <button onclick="showView('login')" class="w-full text-zinc-500 text-sm">Ya tengo cuenta. <span class="text-yellow-500">Volver</span></button>
+            </div>
+        </div>
+
+        <!-- VISTA: CLIENTE DASHBOARD -->
+        <div id="view-client-home" class="hidden py-6">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <p class="text-zinc-500 text-sm font-bold uppercase tracking-tighter">Bienvenido</p>
+                    <h2 class="text-2xl font-black"><span id="user-name">...</span> 👋</h2>
+                </div>
+                <button onclick="logout()" class="p-2 bg-zinc-900 rounded-full text-sm">🚪</button>
+            </div>
+
+            <div class="gold-gradient p-8 rounded-[2.5rem] shadow-2xl shadow-yellow-600/20 text-black relative overflow-hidden mb-8">
+                <p class="font-black opacity-60 uppercase text-xs tracking-widest">Mis Puntos</p>
+                <div class="flex items-center">
+                    <span class="text-7xl font-black italic tracking-tighter" id="user-points">0</span>
+                    <span class="ml-2 text-2xl font-black opacity-40 italic">PTS</span>
+                </div>
+                <div class="mt-6 bg-black/10 h-2 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="bg-black h-full" style="width: 0%"></div>
+                </div>
+                <p class="mt-3 text-xs font-bold" id="next-reward">🔥 Faltan puntos para el próximo premio</p>
+            </div>
+
+            <h3 class="font-black text-sm uppercase tracking-widest mb-4 text-yellow-500">Ganar Puntos</h3>
+            <div class="grid grid-cols-2 gap-3 mb-8">
+                <div class="bg-dark-card p-4 rounded-2xl">
+                    <p
